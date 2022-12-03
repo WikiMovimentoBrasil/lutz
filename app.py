@@ -4,7 +4,8 @@ from flask import request
 import yaml
 import os
 import pandas as pd
-import pymysql
+
+from sqlalchemy import create_engine
 
 app = flask.Flask(__name__)
 
@@ -82,9 +83,12 @@ limit {limit}
 
 def create_connection(wiki):
     db = DATABASE.format(wiki=wiki)
-    con = pymysql.connect(host=f"{wiki}.analytics.db.svc.wikimedia.cloud",
-                          read_default_file=app.config["REPLICA_FILE"],
-                          database=db)
+    host = f"{wiki}.analytics.db.svc.wikimedia.cloud"
+    constr = f'mysql+pymysql://{host}/{db}'
+
+    con = create_engine(constr, pool_recycle=60, connect_args={
+        'read_default_file': app.config["REPLICA_FILE"],
+    })
     return con
 
 
