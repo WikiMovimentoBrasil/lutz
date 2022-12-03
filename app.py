@@ -10,7 +10,8 @@ app = flask.Flask(__name__)
 
 # Load configuration from YAML file
 __dir__ = os.path.dirname(__file__)
-app.config["REPLICA_FILE"] = "$HOME/replica.my.cnf"
+home = os.environ.get('HOME')
+app.config["REPLICA_FILE"] = f"{home}/replica.my.cnf"
 app.config.update(
     yaml.safe_load(open(os.path.join(__dir__, 'config.yaml'))))
 
@@ -89,9 +90,12 @@ def create_connection(wiki):
 
 def get_gender_stats(df, limit):
     """Gets gender stats from query dataframe"""
+    limit = int(limit)
 
-    # df['up_value'] = df['up_value'].fillna(b'neutral')
-    # df['user_name'] = df['user_name'].str.decode("utf-8")
+    df['up_value'] = df['up_value'].fillna(b'neutral')
+    df['up_value'] = df['up_value'].str.decode("utf-8")
+    df['user_name'] = df['user_name'].str.decode("utf-8")
+
     describe = df.groupby(df['up_value']).describe()
     describe.loc[:, ('user_editcount', '%_of_editors')] = describe[
         'user_editcount']['count']/limit * 100
