@@ -119,3 +119,14 @@ def historical():
     df = pd.read_sql(historical_query.format(tagged_bots=remove_tagged_bots,
                      limit=limit), con)
     return get_gender_stats(df, limit).to_json()
+
+
+@app.route('/recent')
+def recent():
+    wiki = request.args.get('wiki', 'ptwiki')
+    limit = request.args.get('limit', '100')
+    con = create_connection(wiki)
+    df = pd.read_sql(recent_changes_query.format(
+                     tagged_bots=remove_tagged_bots,
+                     limit=limit), con)
+    return get_gender_stats(df, limit).to_json()
