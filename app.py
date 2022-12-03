@@ -4,6 +4,7 @@ from flask import request
 import yaml
 import os
 import pandas as pd
+import numpy as np
 
 from sqlalchemy import create_engine
 
@@ -16,6 +17,9 @@ app.config["REPLICA_FILE"] = f"{home}/replica.my.cnf"
 app.config.update(
     yaml.safe_load(open(os.path.join(__dir__, 'config.yaml'))))
 
+
+# pandas is giving throwing a numpy deprecation warning
+np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 
 DATABASE = '{wiki}_p'
 # con = create_engine(constr, pool_recycle= 60)
