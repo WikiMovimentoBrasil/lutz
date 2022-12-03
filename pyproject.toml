@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "lutz"
+version = "0.1.0"
+description = "Tool to calculate and display gendergap statistics in Wikimedia projects."
+authors = ["Chico Venancio <chicocvenancio@wmnobrasil.org>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Flask = "^2.2.2"
+pyyaml = "^6.0"
+pandas = "^1.5.2"
+pymysql = "^1.0.2"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
