@@ -100,8 +100,9 @@ def get_gender_stats(df, limit):
     describe.loc[:, ('user_editcount', '%_of_editors')] = describe[
         'user_editcount']['count']/limit * 100
     total_edits = df.loc[:, 'user_editcount'].sum()
-    describe = pd.concat([describe, df.groupby('up_value').sum()], axis=1
-                         ).reindex(describe.index)
+    describe = pd.concat([describe, df.groupby('up_value').sum(
+        numeric_only=True)],
+        axis=1).reindex(describe.index)
     describe.loc[:, ('%_of_edits')] = describe.loc[:, ('user_editcount'
                                                        )]/total_edits * 100
     out = describe.loc[:, [('user_editcount', '%_of_editors'),
