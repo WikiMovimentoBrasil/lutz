@@ -227,4 +227,5 @@ def snapshots():
         Snapshot.type == snapshot_type,
         Snapshot.limit == limit,
     )
+    session.close()
     return [snap.to_dict() for snap in snapshots]
