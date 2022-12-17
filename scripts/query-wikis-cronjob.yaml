@@ -22,8 +22,7 @@ spec:
             workingDir: /data/project/lutz
             image: docker-registry.tools.wmflabs.org/toolforge-python39-sssd-base:latest
             args:
-            - /bin/sh
-            - -c
+            - python3
             - /data/project/lutz/lutz/scripts/automated_wikis.py
             env:
             - name: HOME
