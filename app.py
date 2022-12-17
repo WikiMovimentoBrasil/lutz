@@ -162,8 +162,8 @@ def recent():
         )
         session.add(snap)
         session.commit()
-        session.close()
         results = snap.to_dict()
+        session.close()
     return results
 
 
