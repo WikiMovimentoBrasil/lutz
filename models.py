@@ -28,4 +28,5 @@ class Snapshot(Base):
     editors_neutral = Column(Integer)
     edits_male = Column(Integer)
     edits_female = Column(Integer)
-    edtis_neutral = Column(Integer)
+    edits_neutral = Column(Integer)
+    limit = Column(Integer)
