@@ -3,10 +3,15 @@ import flask
 from flask import request
 import yaml
 import os
+import datetime
 import pandas as pd
 import numpy as np
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from models import Snapshot
+
 
 app = flask.Flask(__name__)
 
@@ -85,7 +90,7 @@ limit {limit}
 '''
 
 
-def create_connection(wiki):
+def create_replicas_connection(wiki):
     db = DATABASE.format(wiki=wiki)
     host = f"{wiki}.analytics.db.svc.wikimedia.cloud"
     constr = f'mysql+pymysql://{host}/{db}'
@@ -124,7 +129,7 @@ def get_gender_stats(df, limit):
 def historical():
     wiki = request.args.get('wiki', 'ptwiki')
     limit = request.args.get('limit', '100')
-    con = create_connection(wiki)
+    con = create_replicas_connection(wiki)
     df = pd.read_sql(historical_query.format(tagged_bots=remove_tagged_bots,
                      limit=limit), con)
     return get_gender_stats(df, limit).to_json()
@@ -134,8 +139,50 @@ def historical():
 def recent():
     wiki = request.args.get('wiki', 'ptwiki')
     limit = request.args.get('limit', '100')
-    con = create_connection(wiki)
+    replicas_con = create_replicas_connection(wiki)
     df = pd.read_sql(recent_changes_query.format(
                      tagged_bots=remove_tagged_bots,
-                     limit=limit), con)
-    return get_gender_stats(df, limit).to_json()
+                     limit=limit), replicas_con)
+    snapshot_con = create_snapshot_data_connection()
+    results = get_gender_stats(df, limit).to_json()
+    if maybe_snapshot('recent', wiki, snapshot_con):
+        session = sessionmaker(bind=snapshot_con)
+        session.add(Snapshot(
+            wiki=wiki,
+            type='recent',
+            timestamp=datetime.datetime.now(),
+            editors_male=results['count']['male'],
+            editors_female=results['count']['female'],
+            editors_neutral=results['count']['neutral'],
+            edits_male=results['editcount']['male'],
+            edits_female=results['editcount']['female'],
+            edits_neutral=results['editcount']['neutral'],
+        ))
+    return results
+
+
+def create_snapshot_data_connection():
+    db = app.config['database']
+    host = "tools.db.svc.wikimedia.cloud"
+    constr = f'mysql+pymysql://{host}/{db}'
+
+    con = create_engine(constr, pool_recycle=60, connect_args={
+        'read_default_file': app.config["REPLICA_FILE"],
+    })
+    return con
+
+
+def maybe_snapshot(
+    snapshot_type, wiki, con,
+    timedelta=datetime.timedelta(hours=12)
+):
+    session = sessionmaker(bind=con)
+    existing_snapshot = session.query(Snapshot).filter(
+        Snapshot.wiki == wiki,
+        Snapshot.timestamp > datetime.datetime.now() - timedelta,
+        Snapshot.type == snapshot_type)
+    if existing_snapshot.first() is None:
+        session.close()
+        return True
+    session.close()
+    return False
