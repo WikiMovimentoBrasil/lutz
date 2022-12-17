@@ -38,7 +38,7 @@ class Snapshot(Base):
         return {
             "wiki": self.wiki,
             "limit": self.limit,
-            "timestamp": self.timestamp,
+            "timestamp": self.timestamp.isoformat(),
             "results": {
                 '%_of_editors': {
                     "male": self.editors_male/self.limit,
