@@ -180,7 +180,7 @@ def create_snapshot_data_connection():
 
 def maybe_snapshot(
     snapshot_type, wiki, con, limit,
-    timedelta=datetime.timedelta(hours=12)
+    timedelta=datetime.timedelta(hours=11)
 ):
     session = Session(bind=con)
     existing_snapshot = session.query(Snapshot).filter(
