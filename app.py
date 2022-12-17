@@ -194,3 +194,37 @@ def maybe_snapshot(
         return (True, None)
     session.close()
     return (False, existing_snapshot.first().to_dict())
+
+
+@app.route('/snapshots')
+def snapshots():
+    wiki = request.args.get('wiki', 'ptwiki')
+    snapshot_type = request.args.get('snapshot_type', 'recent')
+    limit = request.args.get('limit', '100')
+    before = request.args.get('before', '')
+    if before == '':
+        before = datetime.datetime.now()
+    else:
+        try:
+            before = datetime.datetime.fromisoformat(before)
+        except Exception:
+            raise TypeError("Before date cannot be parsed. Is it ISO 8601?")
+    after = request.args.get('after', '')
+    if after == '':
+        after = datetime.datetime.now() - datetime.timedelta(days=30)
+    else:
+        try:
+            after = datetime.datetime.fromisoformat(after)
+        except Exception:
+            raise TypeError("After date cannot be parsed. Is it ISO 8601?")
+    snapshot_con = create_snapshot_data_connection()
+
+    session = Session(bind=snapshot_con)
+    snapshots = session.query(Snapshot).filter(
+        Snapshot.wiki == wiki,
+        Snapshot.timestamp >= after,
+        Snapshot.timestamp < before,
+        Snapshot.type == snapshot_type,
+        Snapshot.limit == limit,
+    )
+    return [snap.to_dict() for snap in snapshots]
