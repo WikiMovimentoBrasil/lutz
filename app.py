@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 
 from models import Snapshot
 
@@ -146,7 +146,7 @@ def recent():
     snapshot_con = create_snapshot_data_connection()
     results = get_gender_stats(df, limit).to_json()
     if maybe_snapshot('recent', wiki, snapshot_con):
-        session = sessionmaker(bind=snapshot_con)
+        session = session(bind=snapshot_con)
         session.add(Snapshot(
             wiki=wiki,
             type='recent',
@@ -158,6 +158,8 @@ def recent():
             edits_female=results['editcount']['female'],
             edits_neutral=results['editcount']['neutral'],
         ))
+        session.commit()
+        session.close()
     return results
 
 
@@ -176,7 +178,7 @@ def maybe_snapshot(
     snapshot_type, wiki, con,
     timedelta=datetime.timedelta(hours=12)
 ):
-    session = sessionmaker(bind=con)
+    session = Session(bind=con)
     existing_snapshot = session.query(Snapshot).filter(
         Snapshot.wiki == wiki,
         Snapshot.timestamp > datetime.datetime.now() - timedelta,
