@@ -144,23 +144,26 @@ def recent():
                      tagged_bots=remove_tagged_bots,
                      limit=limit), replicas_con)
     snapshot_con = create_snapshot_data_connection()
-    results = get_gender_stats(df, limit).to_dict()
-    if maybe_snapshot('recent', wiki, snapshot_con, limit):
+    test, results = maybe_snapshot('recent', wiki, snapshot_con, limit)
+    if test:
+        stats = get_gender_stats(df, limit).to_dict()
         session = Session(bind=snapshot_con)
-        session.add(Snapshot(
+        snap = Snapshot(
             wiki=wiki,
             type='recent',
             timestamp=datetime.datetime.now(),
-            editors_male=results['count']['male'],
-            editors_female=results['count']['female'],
-            editors_neutral=results['count']['neutral'],
-            edits_male=results['editcount']['male'],
-            edits_female=results['editcount']['female'],
-            edits_neutral=results['editcount']['neutral'],
+            editors_male=stats['count']['male'],
+            editors_female=stats['count']['female'],
+            editors_neutral=stats['count']['neutral'],
+            edits_male=stats['editcount']['male'],
+            edits_female=stats['editcount']['female'],
+            edits_neutral=stats['editcount']['neutral'],
             limit=limit,
-        ))
+        )
+        session.add(snap)
         session.commit()
         session.close()
+        results = snap.to_dict()
     return results
 
 
@@ -188,6 +191,6 @@ def maybe_snapshot(
     )
     if existing_snapshot.first() is None:
         session.close()
-        return True
+        return (True, None)
     session.close()
-    return False
+    return (False, existing_snapshot.first().to_dict())
