@@ -1,0 +1,33 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: query-wikis
+  labels:
+    name: lutz.query-wikis
+    # The toolforge=tool label will cause $HOME and other paths to be mounted from Toolforge
+    toolforge: tool
+spec:
+  schedule: "38 3,15 * * *"
+  startingDeadlineSeconds: 600
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            toolforge: tool
+        spec:
+          containers:
+          - name: bot
+            workingDir: /data/project/lutz
+            image: docker-registry.tools.wmflabs.org/toolforge-python39-sssd-base:latest
+            args:
+            - /bin/sh
+            - -c
+            - /data/project/lutz/lutz/scripts/automated_wikis.py
+            env:
+            - name: HOME
+              value: /data/project/lutz
+            - name: VIRTUAL_ENV
+              value: /data/project/lutz/www/python/venv
+          restartPolicy: OnFailure
