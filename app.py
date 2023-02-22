@@ -238,5 +238,5 @@ def index(path):
 
 
 @app.route('/<path:path>')
-def static(path):
+def static_files(path):
     return send_from_directory('static/lutz/dist', path)
