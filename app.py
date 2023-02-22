@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import flask
-from flask import request, send_from_directory
+from flask import request, send_from_directory, send_file
 import yaml
 import os
 import datetime
@@ -232,6 +232,11 @@ def snapshots():
     return [snap.to_dict() for snap in snapshots]
 
 
-@app.route('/<path:path>')
+@app.route('/')
 def index(path):
-    return send_from_directory('', path)
+    return send_file('static/lutz/dist/index.html')
+
+
+@app.route('/<path:path>')
+def static(path):
+    return send_from_directory('static/lutz/dist', path)
