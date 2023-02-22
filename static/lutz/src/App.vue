@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
   <header>
-    <img alt="Bertha Lutz" class="logo" src="@/assets/bertha-removebg.png" width="125" height="125" />
+    <img alt="Bertha Lutz" class="logo" src="@/assets/bertha-removebg.png" width="70" height="70" />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
       <nav>
         <RouterLink to="/">{{ $t("menu.home")}}</RouterLink>
         <RouterLink to="/about">{{ $t("menu.about")}}</RouterLink>
       </nav>
     </div>
+    <div class="locale-changer">
+      <select v-model="$i18n.locale">
+      <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">{{ locale }}</option>
+    </select>
+  </div>
   </header>
 
   <RouterView />

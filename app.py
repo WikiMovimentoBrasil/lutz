@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import flask
-from flask import request
+from flask import request, send_from_directory
 import yaml
 import os
 import datetime
@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import Session
 
 from models import Snapshot
@@ -97,7 +98,7 @@ def create_replicas_connection(wiki):
 
     con = create_engine(constr, pool_recycle=60, connect_args={
         'read_default_file': app.config["REPLICA_FILE"],
-    })
+    }, poolclass=NullPool)
     return con
 
 
@@ -174,7 +175,7 @@ def create_snapshot_data_connection():
 
     con = create_engine(constr, pool_recycle=60, connect_args={
         'read_default_file': app.config["REPLICA_FILE"],
-    })
+    }, poolclass=NullPool)
     return con
 
 
@@ -229,3 +230,8 @@ def snapshots():
     )
     session.close()
     return [snap.to_dict() for snap in snapshots]
+
+
+@app.route('/<path:path>')
+def index(path):
+    return send_from_directory('', path)
