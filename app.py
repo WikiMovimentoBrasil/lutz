@@ -233,7 +233,7 @@ def snapshots():
 
 
 @app.route('/')
-def index(path):
+def index():
     return send_file('static/lutz/dist/index.html')
 
 
