@@ -12,9 +12,11 @@ from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import Session
 
 from models import Snapshot
+from flask_cors import CORS
 
 
 app = flask.Flask(__name__)
+CORS(app)
 
 # Load configuration from YAML file
 __dir__ = os.path.dirname(__file__)
@@ -24,7 +26,7 @@ app.config.update(
     yaml.safe_load(open(os.path.join(__dir__, 'config.yaml'))))
 
 
-# pandas is giving throwing a numpy deprecation warning
+# pandas is throwing a numpy deprecation warning
 np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 
 DATABASE = '{wiki}_p'
