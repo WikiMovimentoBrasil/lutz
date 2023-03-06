@@ -85,7 +85,7 @@ left join
         )
         {tagged_bots}
     AND
-    recentchanges.rc_type != 5
+    recentchanges.rc_type < 3
 GROUP BY recentchanges.rc_actor
 ORDER BY
     user_editcount desc
