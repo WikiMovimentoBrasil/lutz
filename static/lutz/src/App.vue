@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 </script>
+<script lang="ts">
+ export default {
+    data () {
+      return {
+        locales: this.$i18n.availableLocales,
+      }
+    },
+  }</script>
 
 <template>
   <header>
@@ -13,9 +21,12 @@ import { RouterLink, RouterView } from 'vue-router'
       </nav>
     </div>
     <div class="locale-changer">
-      <select v-model="$i18n.locale">
-      <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">{{ locale }}</option>
-    </select>
+      <v-select
+        :items="locales"
+        prepend-inner-icon="mdi-translate-variant"
+        v-model="$i18n.locale"
+      >
+      </v-select>
   </div>
   </header>
 

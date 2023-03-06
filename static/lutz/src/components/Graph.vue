@@ -29,6 +29,8 @@ ChartJS.register(
   Colors
 )
 
+const host = 'https://lutz.toolforge.org/'
+
 export default {
     name: 'App',
     components: {
@@ -42,7 +44,7 @@ export default {
         this.loaded = false
 
         try {
-        const snapshots  = await fetch('/snapshots?limit=1000&wiki=ptwiki')
+        const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=ptwiki`)
         const apiData = await snapshots.json()
         
         const dataType = "%_of_editors"
@@ -60,7 +62,7 @@ export default {
     watch: {
         "$i18n.locale": async function(){
             //TODO refactor to reuse existing data and only change labels
-            const snapshots  = await fetch('/snapshots?limit=1000&wiki=ptwiki')
+            const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=ptwiki`)
             const apiData = await snapshots.json()
             
             const dataType = "%_of_editors"
