@@ -233,6 +233,12 @@ def snapshots():
     session.close()
     return [snap.to_dict() for snap in snapshots]
 
+@app.route('/wikis')
+def wikis():
+    snapshot_con = create_snapshot_data_connection()
+    session = Session(bind=snapshot_con)
+    wikis = session.query(Snapshot.wiki).distinct()
+    return [wiki[0] for wiki in wikis]
 
 @app.route('/')
 def index():

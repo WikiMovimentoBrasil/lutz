@@ -32,7 +32,7 @@ ChartJS.register(
 const host = 'https://lutz.toolforge.org/'
 
 export default {
-    name: 'App',
+    name: 'Graph',
     components: {
         Line
     },
