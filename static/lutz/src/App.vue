@@ -14,20 +14,23 @@ import { RouterLink, RouterView } from 'vue-router'
   <header>
     <img alt="Bertha Lutz" class="logo" src="@/assets/bertha-removebg.png" width="60" height="60" />
 
-    <div class="wrapper">
+    <div class="wrapper-left">
       <nav>
         <RouterLink to="/">{{ $t("menu.home")}}</RouterLink>
         <RouterLink to="/about">{{ $t("menu.about")}}</RouterLink>
       </nav>
+      <div class="locale-changer">
+        <v-select
+          :items="locales"
+          prepend-inner-icon="mdi-translate-variant"
+          v-model="$i18n.locale"
+        >
+        </v-select>
+      </div>
     </div>
-    <div class="locale-changer">
-      <v-select
-        :items="locales"
-        prepend-inner-icon="mdi-translate-variant"
-        v-model="$i18n.locale"
-      >
-      </v-select>
-  </div>
+    <div class="wrapper-right">
+      <img alt="Logo negativo do Wiki Movimento Brasil" class="logo-wmb" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Wiki_Movimento_Brasil_-_logo_negativo.svg" />
+    </div>
   </header>
 
   <RouterView />
@@ -37,8 +40,26 @@ import { RouterLink, RouterView } from 'vue-router'
 header {
   line-height: 1.5;
   max-height: 100vh;
+  min-height: 9vh;
 }
 
+.locale-changer {
+}
+.logo-wmb {
+  max-height: 8vh;
+  position: absolute;
+  margin-top: 0.5vh;
+  right: 0;
+
+}
+.wrapper-right {
+  display: block;
+  position: absolute;
+  right: 0;
+  margin: 0 auto 2rem;
+  min-height: 5vh;
+  min-width: 40vh;
+}
 .logo {
   display: block;
   margin: 0 auto 2rem;
@@ -80,10 +101,13 @@ nav a:first-of-type {
     margin: 0 2rem 0 0;
   }
 
-  header .wrapper {
+  header .wrapper-left {
     display: flex;
     place-items: flex-start;
     flex-wrap: wrap;
+    min-width: 35vh;
+    justify-content: center;
+    align-items: center;
   }
 
   nav {
