@@ -16,6 +16,7 @@ const messages = {
             Female: "Female",
             Male: "Male",
             Neutral: "Neutral",
+            dataType: "Type of data",
             about: "This tool grabs the data for gender set in user preferences by each editor in Wikimedia projects and graphs it."
         },
         menu: {
@@ -30,6 +31,7 @@ const messages = {
             Female: "Feminino",
             Male: "Masculino",
             Neutral: "Não especificado",
+            dataType: "Tipo de dados",
             about: "Essa ferramenta puxa os dados de gêneros definidos nas preferências de cada editor em projetos Wikimedia e cria gráficos."
         },
         menu: {

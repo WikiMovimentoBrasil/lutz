@@ -30,4 +30,4 @@ export function dataSets(apiData:any, type:DataType, component:any) {
 
 }
 
-type DataType = "%_of_editors"|  "%_of_edits" | "count"| "editcount"
+export type DataType = "%_of_editors"|  "%_of_edits" | "count"| "editcount"
