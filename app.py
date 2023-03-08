@@ -155,12 +155,12 @@ def recent():
             wiki=wiki,
             type='recent',
             timestamp=datetime.datetime.now(),
-            editors_male=stats['count']['male'],
-            editors_female=stats['count']['female'],
-            editors_neutral=stats['count']['neutral'],
-            edits_male=stats['editcount']['male'],
-            edits_female=stats['editcount']['female'],
-            edits_neutral=stats['editcount']['neutral'],
+            editors_male=stats['count'].get('male', 0),
+            editors_female=stats['count'].get('female', 0),
+            editors_neutral=stats['count'].get('neutral', 0),
+            edits_male=stats['editcount'].get('male', 0),
+            edits_female=stats['editcount'].get('female', 0),
+            edits_neutral=stats['editcount'].get('neutral', 0),
             limit=limit,
         )
         session.add(snap)
