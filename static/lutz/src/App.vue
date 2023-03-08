@@ -12,7 +12,7 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header>
-    <img alt="Bertha Lutz" class="logo" src="@/assets/bertha-removebg.png" width="70" height="70" />
+    <img alt="Bertha Lutz" class="logo" src="@/assets/bertha-removebg.png" width="60" height="60" />
 
     <div class="wrapper">
       <nav>

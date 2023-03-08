@@ -8,19 +8,28 @@
         hide-no-data
         hide-details
         label="wiki"
-        @update:model-value="this.$emit('changedWiki', this.select)"
+        @update:model-value="emitChangedWiki"
       ></v-autocomplete>
+      <v-select
+        v-model="dataType"
+        :items="dataTypes"
+        :label="this.$t('message.dataType')"
+        @update:model-value="this.$emit('changedDataType', this.dataType)"
+      />
   </template>
 <script lang="ts">
 const host = 'https://lutz.toolforge.org/'
+import type {DataType} from './GraphConfig.js'
 export default {
   data () {
     return {
-        loaded: false,
+      loaded: false,
       loading: false,
       items: [ 'ptwiki'],
       select: 'ptwiki',
-      wikis: [ 'ptwiki']
+      wikis: [ 'ptwiki'],
+      dataTypes: ['%_of_editors', 'count', 'editcount', '%_of_edits'],
+      dataType: <DataType> '%_of_edits'
     }
   },
   async mounted () {
@@ -33,5 +42,10 @@ export default {
     console.error(e)
         }
     },
+  methods:{
+    emitChangedWiki: function(event: unknown){
+      this.$emit('changedWiki', this.select)
+    }
+  }
 }
 </script>

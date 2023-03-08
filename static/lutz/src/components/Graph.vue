@@ -1,5 +1,5 @@
 <template>
-  <GraphOptions> </GraphOptions>
+  <GraphOptions @changedWiki="changedWiki" @changedDataType="changedDataType"> </GraphOptions>
   <Line v-if="loaded" :data="data" ref="line" />
   <div v-else> {{$t("message.loading")}}</div>
 </template>
@@ -18,6 +18,7 @@ import {
 } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import * as chartConfig from './GraphConfig.js'
+import type {DataType} from './GraphConfig.js'
 import GraphOptions from './GraphOptions.vue'
 
 ChartJS.register(
@@ -42,7 +43,8 @@ export default {
     data: () => ({
         loaded: false,
         wiki: 'ptwiki',
-        data: {labels: [], datasets: [{}], }
+        dataType: <DataType> "%_of_edits",
+        data: {labels: [], datasets: <unknown> [{}], }
     }),
     async mounted () {
         this.loaded = false
@@ -55,24 +57,28 @@ export default {
             this.getData()
             this.$refs.line.chart.update()
         },
-        "GraphOptions.select": async function(event){
+    },
+    methods: {
+        changedWiki: function(event: string){
             this.wiki = event
             this.getData()
             this.$refs.line.chart.update()
-        }
-    },
-    methods: {
+        },
+        changedDataType: function(event: DataType){
+            this.dataType = event
+            this.getData()
+            this.$refs.line.chart.update()
+        },
         getData: async function(){
             try {
                 const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=${this.wiki}`)
                 const apiData = await snapshots.json()
                 
-                const dataType = "%_of_editors"
                 this.data = {
                     labels: apiData.map(function(item:any){
                         return item["timestamp"].slice(0,10)
                     }),
-                    datasets: chartConfig.dataSets(apiData, dataType, this)
+                    datasets: chartConfig.dataSets(apiData, this.dataType, this)
                 }
         } catch (e) {
         console.error(e)
