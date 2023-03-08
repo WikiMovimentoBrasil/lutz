@@ -14,16 +14,18 @@ import { RouterLink, RouterView } from 'vue-router'
   <header>
     <img alt="Bertha Lutz" class="logo" src="@/assets/bertha-removebg.png" width="60" height="60" />
 
-    <div class="wrapper-left">
       <nav>
         <RouterLink to="/">{{ $t("menu.home")}}</RouterLink>
         <RouterLink to="/about">{{ $t("menu.about")}}</RouterLink>
       </nav>
+    <div class="wrapper-left">
       <div class="locale-changer">
         <v-select
           :items="locales"
           prepend-inner-icon="mdi-translate-variant"
           v-model="$i18n.locale"
+          density="compact"
+          :hide-details=true
         >
         </v-select>
       </div>
@@ -41,6 +43,9 @@ header {
   line-height: 1.5;
   max-height: 100vh;
   min-height: 9vh;
+}
+nav {
+  max-width: fit-content;
 }
 
 .locale-changer {
@@ -60,6 +65,11 @@ header {
   min-height: 5vh;
   min-width: 40vh;
 }
+.wrapper-left {
+  position: relative;
+  display: block;
+  left: 0;
+  }
 .logo {
   display: block;
   margin: 0 auto 2rem;
@@ -99,15 +109,6 @@ nav a:first-of-type {
 
   .logo {
     margin: 0 2rem 0 0;
-  }
-
-  header .wrapper-left {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-    min-width: 35vh;
-    justify-content: center;
-    align-items: center;
   }
 
   nav {
