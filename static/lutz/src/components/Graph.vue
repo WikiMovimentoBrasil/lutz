@@ -1,5 +1,6 @@
 <template>
-  <Line v-if="loaded" :data="data" ref="line"/>
+  <GraphOptions> </GraphOptions>
+  <Line v-if="loaded" :data="data" ref="line" />
   <div v-else> {{$t("message.loading")}}</div>
 </template>
 
@@ -17,6 +18,7 @@ import {
 } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import * as chartConfig from './GraphConfig.js'
+import GraphOptions from './GraphOptions.vue'
 
 ChartJS.register(
   CategoryScale,
@@ -34,45 +36,48 @@ const host = 'https://lutz.toolforge.org/'
 export default {
     name: 'Graph',
     components: {
-        Line
+        Line,
+        GraphOptions
     },
     data: () => ({
         loaded: false,
+        wiki: 'ptwiki',
         data: {labels: [], datasets: [{}], }
     }),
     async mounted () {
         this.loaded = false
-
-        try {
-        const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=ptwiki`)
-        const apiData = await snapshots.json()
-        
-        const dataType = "%_of_editors"
-        this.data = {
-            labels: apiData.map(function(item:any){
-                return item["timestamp"].slice(0,10)
-            }),
-            datasets: chartConfig.dataSets(apiData, dataType, this)
-        }
+        this.getData()
         this.loaded = true
-        } catch (e) {
-        console.error(e)
-        }
+
     },
     watch: {
         "$i18n.locale": async function(){
-            //TODO refactor to reuse existing data and only change labels
-            const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=ptwiki`)
-            const apiData = await snapshots.json()
-            
-            const dataType = "%_of_editors"
-            this.data = {
-                labels: apiData.map(function(item:any){
-                    return item["timestamp"].slice(0,10)
-                }),
-                datasets: chartConfig.dataSets(apiData, dataType, this)
-            }
+            this.getData()
             this.$refs.line.chart.update()
+        },
+        "GraphOptions.select": async function(event){
+            this.wiki = event
+            this.getData()
+            this.$refs.line.chart.update()
+        }
+    },
+    methods: {
+        getData: async function(){
+            try {
+                const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=${this.wiki}`)
+                const apiData = await snapshots.json()
+                
+                const dataType = "%_of_editors"
+                this.data = {
+                    labels: apiData.map(function(item:any){
+                        return item["timestamp"].slice(0,10)
+                    }),
+                    datasets: chartConfig.dataSets(apiData, dataType, this)
+                }
+        } catch (e) {
+        console.error(e)
+        }
+
         }
     }
 
