@@ -142,13 +142,13 @@ def historical():
 def recent():
     wiki = request.args.get('wiki', 'ptwiki')
     limit = request.args.get('limit', '100')
-    replicas_con = create_replicas_connection(wiki)
-    df = pd.read_sql(recent_changes_query.format(
-                     tagged_bots=remove_tagged_bots,
-                     limit=limit), replicas_con)
     snapshot_con = create_snapshot_data_connection()
     test, results = maybe_snapshot('recent', wiki, snapshot_con, limit)
     if test:
+        replicas_con = create_replicas_connection(wiki)
+        df = pd.read_sql(recent_changes_query.format(
+                        tagged_bots=remove_tagged_bots,
+                        limit=limit), replicas_con)
         stats = get_gender_stats(df, limit).to_dict()
         session = Session(bind=snapshot_con)
         snap = Snapshot(
