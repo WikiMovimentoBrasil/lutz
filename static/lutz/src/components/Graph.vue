@@ -1,5 +1,9 @@
 <template>
-  <GraphOptions @changedWiki="changedWiki" @changedDataType="changedDataType"> </GraphOptions>
+    <GraphOptions
+        @changedWiki="changedWiki"
+        @changedDataType="changedDataType"
+        @changedStartDate="changedStartDate"
+    > </GraphOptions>
   <Line v-if="loaded" :data="data" ref="line" />
   <div v-else> {{$t("message.loading")}}</div>
 </template>
@@ -44,10 +48,13 @@ export default {
         loaded: false,
         wiki: 'ptwiki',
         dataType: <DataType> "%_of_edits",
+        startDate: <Date> new Date(new Date().setDate(new Date().getDate() - 30)),
+        startDateStr: <string> "",
         data: {labels: [], datasets: <unknown> [{}], }
     }),
     async mounted () {
         this.loaded = false
+        this.startDateStr = this.startDate.toISOString().split('T')[0]
         this.getData()
         this.loaded = true
 
@@ -69,9 +76,15 @@ export default {
             this.getData()
             this.$refs.line.chart.update()
         },
+        changedStartDate: function(event: string){
+            this.startDateStr = event
+            console.log(`changed start date to ${event}`)
+            this.getData()
+            this.$refs.line.chart.update()
+        },
         getData: async function(){
             try {
-                const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=${this.wiki}`)
+                const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=${this.wiki}&after=${this.startDateStr}`)
                 const apiData = await snapshots.json()
                 
                 this.data = {
