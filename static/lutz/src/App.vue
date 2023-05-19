@@ -61,6 +61,7 @@ nav {
   display: block;
   position: absolute;
   right: 0;
+  top: 0;
   margin: 0 auto 2rem;
   min-height: 5vh;
   min-width: 40vh;
@@ -72,7 +73,7 @@ nav {
   }
 .logo {
   display: block;
-  margin: 0 auto 2rem;
+  margin: 0 2rem 0 0;
 }
 
 nav {
@@ -100,15 +101,11 @@ nav a:first-of-type {
   border: 0;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 620px) {
   header {
     display: flex;
     place-items: center;
     padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
   }
 
   nav {

@@ -1,4 +1,6 @@
 <template>
+  <v-row>
+    <v-col cols="4" sm="4" md="2">
       <v-autocomplete
         v-if="loaded" 
         v-model="select"
@@ -10,12 +12,16 @@
         label="wiki"
         @update:model-value="emitChangedWiki"
       ></v-autocomplete>
+    </v-col>
+    <v-col cols="6" sm="4" md="2">
       <v-select
         v-model="dataType"
         :items="dataTypes"
         :label="this.$t('message.dataType')"
         @update:model-value="this.$emit('changedDataType', this.dataType)"
       />
+    </v-col>
+    <v-col cols="6" sm="4" md="2">
       <v-text-field
         type="date"
         :label="this.$t('message.startDate')"
@@ -24,7 +30,8 @@
         @update:model-value="emitChangedStartDate"
         emits="changedStartdate"
       ></v-text-field>
-
+    </v-col>
+  </v-row>
   </template>
 <script lang="ts">
 const host = 'https://lutz.toolforge.org/'
