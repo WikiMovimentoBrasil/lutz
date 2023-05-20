@@ -325,7 +325,7 @@ def snapshots():
     if type == 'periodical':
         snapshots = session.query(Snapshot).filter(
             Snapshot.wiki == wiki,
-            Snapshot.period_start < before,
+            Snapshot.period_start < after,
             Snapshot.type == type,
             Snapshot.limit == limit,
         ).order_by(Snapshot.period_start.asc())
