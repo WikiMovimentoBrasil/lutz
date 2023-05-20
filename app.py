@@ -165,6 +165,7 @@ def period():
     snapshot_con = create_snapshot_data_connection()
     period_start = request.args.get('period_start', '')
     period_end = request.args.get('period_end', '')
+    periodicity = request.args.get('periodicity', '')
     if period_start == '' or period_end == '':
         abort(400, description="period_start and period_end must be set")
     try:
@@ -174,7 +175,22 @@ def period():
         period_end_str = period_end.strftime('%Y%m%d%H%M%S')
     except Exception:
         abort(400, description="Could not parse period start and end, is it in ISO format?")
-    test, results = maybe_snapshot('period', wiki, snapshot_con, limit, period_start=period_start, period_end=period_end )
+    if periodicity == 'monthly':
+        if not (period_end.year == period_start.year and
+                period_end.day == period_start.day and period_end.month - period_start.month == 1):
+            abort(400, "Period should be exactly one month")
+    if periodicity == 'weekly':
+        if not (period_start.weekday == 0 and period_end.weekday == 0):
+            abort(400, "Weekly snapshots should start and end on Mondays")
+        if not (period_start - period_end == datetime.timedelta(weeks=1)):
+            abort(400, "Weekly snapshots period should be 1 week")
+    if periodicity == 'daily':
+        if not (period_start - period_end == datetime.timedelta(days=1)):
+            abort(400, "Daily snapshots period should be 1 day")
+
+    test, results = maybe_snapshot(
+        'period', wiki, snapshot_con, limit, period_start=period_start, period_end=period_end,
+        periodicity=periodicity)
     if test:
         replicas_con = create_replicas_connection(wiki)
         #  print(periodical_query.format(
@@ -252,7 +268,8 @@ def create_snapshot_data_connection():
 
 def maybe_snapshot(
     snapshot_type, wiki, con, limit,
-    timedelta=datetime.timedelta(hours=11), period_start=None, period_end=None
+    timedelta=datetime.timedelta(hours=11), period_start=None, period_end=None,
+    periodicity=None
 ):
     session = Session(bind=con)
     if snapshot_type == 'period':
@@ -264,7 +281,8 @@ def maybe_snapshot(
             Snapshot.type == snapshot_type,
             Snapshot.limit == limit,
             Snapshot.period_start == period_start,
-            Snapshot.period_end == period_end
+            Snapshot.period_end == period_end,
+            Snapshot.periodicity == periodicity
         )
     else:
         existing_snapshot = session.query(Snapshot).filter(
@@ -283,7 +301,7 @@ def maybe_snapshot(
 @app.route('/snapshots')
 def snapshots():
     wiki = request.args.get('wiki', 'ptwiki')
-    snapshot_type = request.args.get('snapshot_type', 'recent')
+    snapshot_type = request.args.get('type', 'recent')
     limit = request.args.get('limit', '100')
     before = request.args.get('before', '')
     period_start = request.args.get('period_start', None)

@@ -13,6 +13,12 @@ class SnapshotEnum(enum.Enum):
     historical = 'historical'
 
 
+class PeriodicityEnum(enum.Enum):
+    daily = 'daily'
+    weekly = 'weekly'
+    monthly = 'monthly'
+
+
 Base = declarative_base()
 
 
@@ -33,6 +39,7 @@ class Snapshot(Base):
 
     period_start = Column(DateTime)
     period_end = Column(DateTime)
+    periodicity = Column(Enum(PeriodicityEnum))
 
     def to_dict(self):
         edit_count_total = (
@@ -68,4 +75,5 @@ class Snapshot(Base):
         if self.type == 'period':
             out['period_start'] = self.period_start
             out['period_end'] = self.period_end
+            out['periodicity'] = self.periodicity
         return out
