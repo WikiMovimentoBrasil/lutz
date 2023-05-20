@@ -31,11 +31,14 @@ class Snapshot(Base):
     edits_neutral = Column(Integer)
     limit = Column(Integer)
 
+    period_start = Column(DateTime)
+    period_end = Column(DateTime)
+
     def to_dict(self):
         edit_count_total = (
             self.edits_male + self.edits_female + self.edits_neutral
         )
-        return {
+        out = {
             "wiki": self.wiki,
             "limit": self.limit,
             "timestamp": self.timestamp.isoformat(),
@@ -62,3 +65,7 @@ class Snapshot(Base):
                 },
             }
         }
+        if self.type == 'period':
+            out['period_start'] = self.period_start
+            out['period_end'] = self.period_end
+        return out

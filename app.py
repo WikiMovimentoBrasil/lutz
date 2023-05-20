@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import flask
-from flask import request, send_from_directory, send_file
+from flask import request, send_from_directory, send_file, abort
 import yaml
 import os
 import datetime
@@ -46,6 +46,26 @@ remove_tagged_bots = '''left join
             )
     WHERE
         ug_group is null and ufg_group is null'''
+
+periodical_query = """SELECT
+	`user`.`user_name`,
+    `revs`.`total` AS `user_editcount`,
+    `user_properties`.`up_value`
+FROM `user`
+LEFT JOIN `user_properties` ON (
+  `user`.`user_id` = `user_properties`.`up_user`
+  AND `user_properties`.`up_property` = "gender"
+)
+LEFT JOIN `actor` ON `user`.`user_id` = `actor`.`actor_user`
+LEFT JOIN (
+  SELECT rev_actor, COUNT(rev_id) as `total`
+  FROM revision
+  WHERE rev_timestamp > '{period_start}' AND rev_timestamp < '{period_end}'
+  GROUP BY rev_actor
+) AS `revs` ON `revs`.`rev_actor` = `actor`.`actor_id`
+    {tagged_bots}
+ORDER BY `revs`.`total` DESC
+LIMIT {limit};"""
 
 historical_query = """select
         user_editcount,
@@ -138,6 +158,41 @@ def historical():
     return get_gender_stats(df, limit).to_json()
 
 
+@app.route('/period')
+def period():
+    wiki = request.args.get('wiki', 'ptwiki')
+    limit = request.args.get('limit', '100')
+    snapshot_con = create_snapshot_data_connection()
+    period_start = request.args.get('period_start', '')
+    period_end = request.args.get('period_end', '')
+    if period_start == '' or period_end == '':
+        abort(400, description="period_start and period_end must be set")
+    test, results = maybe_snapshot('period', wiki, snapshot_con, limit, period_start=period_start, period_end=period_end )
+    if test:
+        replicas_con = create_replicas_connection(wiki)
+        df = pd.read_sql(recent_changes_query.format(
+                        tagged_bots=remove_tagged_bots,
+                        limit=limit), replicas_con)
+        stats = get_gender_stats(df, limit).to_dict()
+        session = Session(bind=snapshot_con)
+        snap = Snapshot(
+            wiki=wiki,
+            type='recent',
+            timestamp=datetime.datetime.now(),
+            editors_male=stats['count'].get('male', 0),
+            editors_female=stats['count'].get('female', 0),
+            editors_neutral=stats['count'].get('neutral', 0),
+            edits_male=stats['editcount'].get('male', 0),
+            edits_female=stats['editcount'].get('female', 0),
+            edits_neutral=stats['editcount'].get('neutral', 0),
+            limit=limit,
+        )
+        session.add(snap)
+        session.commit()
+        results = snap.to_dict()
+        session.close()
+    return results
+
 @app.route('/recent')
 def recent():
     wiki = request.args.get('wiki', 'ptwiki')
@@ -183,15 +238,32 @@ def create_snapshot_data_connection():
 
 def maybe_snapshot(
     snapshot_type, wiki, con, limit,
-    timedelta=datetime.timedelta(hours=11)
+    timedelta=datetime.timedelta(hours=11), period_start='', period_end=''
 ):
     session = Session(bind=con)
-    existing_snapshot = session.query(Snapshot).filter(
-        Snapshot.wiki == wiki,
-        Snapshot.timestamp > datetime.datetime.now() - timedelta,
-        Snapshot.type == snapshot_type,
-        Snapshot.limit == limit,
-    )
+    if snapshot_type == 'period':
+        try:
+            period_start = datetime.datetime.strptime(period_start, '%Y%m%d%H%M%S')
+            period_end = datetime.datetime.strptime(period_end, '%Y%m%d%H%M%S')
+        except:
+            abort(400, 'Error parsing period dates')
+        if period_end > datetime.datetime.now():
+            abort(400, 'End period is greater than today, count would be incomplete')
+        existing_snapshot = session.query(Snapshot).filter(
+            Snapshot.wiki == wiki,
+            Snapshot.timestamp > datetime.datetime.now() - timedelta,
+            Snapshot.type == snapshot_type,
+            Snapshot.limit == limit,
+            Snapshot.period_start == period_start,
+            Snapshot.period_end == period_end
+        )
+    else:
+        existing_snapshot = session.query(Snapshot).filter(
+            Snapshot.wiki == wiki,
+            Snapshot.timestamp > datetime.datetime.now() - timedelta,
+            Snapshot.type == snapshot_type,
+            Snapshot.limit == limit,
+        )
     if existing_snapshot.first() is None:
         session.close()
         return (True, None)
@@ -205,6 +277,8 @@ def snapshots():
     snapshot_type = request.args.get('snapshot_type', 'recent')
     limit = request.args.get('limit', '100')
     before = request.args.get('before', '')
+    period_start = request.args.get('period_start', None)
+    period_end = request.args.get('period_end', None)
     if before == '':
         before = datetime.datetime.now()
     else:
@@ -229,6 +303,8 @@ def snapshots():
         Snapshot.timestamp < before,
         Snapshot.type == snapshot_type,
         Snapshot.limit == limit,
+        Snapshot.period_start == period_start,
+        Snapshot.period_end == period_end,
     )
     session.close()
     return [snap.to_dict() for snap in snapshots]
