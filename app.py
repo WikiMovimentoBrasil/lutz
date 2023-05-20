@@ -170,15 +170,21 @@ def period():
     try:
         period_start = datetime.datetime.fromisoformat(period_start)
         period_end = datetime.datetime.fromisoformat(period_end)
+        period_start_str = period_start.strftime('%Y%m%d%H%M%S')
+        period_end_str = period_end.strftime('%Y%m%d%H%M%S')
     except Exception:
         abort(400, description="Could not parse period start and end, is it in ISO format?")
     test, results = maybe_snapshot('period', wiki, snapshot_con, limit, period_start=period_start, period_end=period_end )
     if test:
         replicas_con = create_replicas_connection(wiki)
+        #  print(periodical_query.format(
+        #                  tagged_bots=remove_tagged_bots,
+        #                  limit=limit, period_start=period_start_str,
+        #                  period_end=period_end_str))
         df = pd.read_sql(periodical_query.format(
                         tagged_bots=remove_tagged_bots,
-                        limit=limit, period_start=period_start,
-                        period_end=period_end), replicas_con)
+                        limit=limit, period_start=period_start_str,
+                        period_end=period_end_str), replicas_con)
         stats = get_gender_stats(df, limit).to_dict()
         session = Session(bind=snapshot_con)
         snap = Snapshot(
