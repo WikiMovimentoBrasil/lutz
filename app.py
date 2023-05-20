@@ -328,7 +328,7 @@ def snapshots():
             Snapshot.period_start < before,
             Snapshot.type == type,
             Snapshot.limit == limit,
-        ) 
+        ).order_by(Snapshot.period_start.desc())
 
     else:
         snapshots = session.query(Snapshot).filter(
@@ -337,7 +337,7 @@ def snapshots():
             Snapshot.timestamp < before,
             Snapshot.type == type,
             Snapshot.limit == limit,
-        )
+        ).order_by(Snapshot.timestamp.desc())
     session.close()
     return [snap.to_dict() for snap in snapshots]
 
