@@ -11,6 +11,7 @@ from sqlalchemy.orm import declarative_base
 class SnapshotEnum(enum.Enum):
     recent = 'recent'
     historical = 'historical'
+    periodical = 'periodical'
 
 
 class PeriodicityEnum(enum.Enum):
