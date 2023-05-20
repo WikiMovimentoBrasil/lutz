@@ -48,7 +48,7 @@ export default {
         loaded: false,
         wiki: 'ptwiki',
         dataType: <DataType> "%_of_edits",
-        startDate: <Date> new Date(new Date().setDate(new Date().getDate() - 30)),
+        startDate: <Date> new Date(new Date().setDate(new Date().getDate() - 900)),
         startDateStr: <string> "",
         data: {labels: [], datasets: <unknown> [{}], }
     }),
@@ -84,7 +84,12 @@ export default {
         },
         getData: async function(){
             try {
-                const snapshots  = await fetch(`${host}/snapshots?limit=1000&wiki=${this.wiki}&after=${this.startDateStr}`)
+                const snapshotUrl = new URL(`${host}/snapshots`)
+                snapshotUrl.searchParams.append('limit', '1000')
+                snapshotUrl.searchParams.append('wiki', this.wiki)
+                snapshotUrl.searchParams.append('after', this.startDateStr)
+                snapshotUrl.searchParams.append('type', 'periodical')
+                const snapshots  = await fetch(snapshotUrl)
                 const apiData = await snapshots.json()
                 
                 this.data = {

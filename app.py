@@ -301,11 +301,9 @@ def maybe_snapshot(
 @app.route('/snapshots')
 def snapshots():
     wiki = request.args.get('wiki', 'ptwiki')
-    snapshot_type = request.args.get('type', 'recent')
+    type = request.args.get('type', 'recent')
     limit = request.args.get('limit', '100')
     before = request.args.get('before', '')
-    period_start = request.args.get('period_start', None)
-    period_end = request.args.get('period_end', None)
     if before == '':
         before = datetime.datetime.now()
     else:
@@ -324,15 +322,22 @@ def snapshots():
     snapshot_con = create_snapshot_data_connection()
 
     session = Session(bind=snapshot_con)
-    snapshots = session.query(Snapshot).filter(
-        Snapshot.wiki == wiki,
-        Snapshot.timestamp >= after,
-        Snapshot.timestamp < before,
-        Snapshot.type == snapshot_type,
-        Snapshot.limit == limit,
-        Snapshot.period_start == period_start,
-        Snapshot.period_end == period_end,
-    )
+    if type == 'periodical':
+        snapshots = session.query(Snapshot).filter(
+            Snapshot.wiki == wiki,
+            Snapshot.period_start < before,
+            Snapshot.type == type,
+            Snapshot.limit == limit,
+        ) 
+
+    else:
+        snapshots = session.query(Snapshot).filter(
+            Snapshot.wiki == wiki,
+            Snapshot.timestamp >= after,
+            Snapshot.timestamp < before,
+            Snapshot.type == type,
+            Snapshot.limit == limit,
+        )
     session.close()
     return [snap.to_dict() for snap in snapshots]
 

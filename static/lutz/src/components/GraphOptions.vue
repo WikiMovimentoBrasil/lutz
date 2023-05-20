@@ -1,5 +1,13 @@
 <template>
   <v-row>
+    <v-col cols="6" sm="4" md="2">
+      <v-select
+        v-model="periodicity"
+        :items="periodicities"
+        :label="this.$t('message.periodicity')"
+        @update:model-value="emitChangedPeriodicity"
+      />
+    </v-col>
     <v-col cols="4" sm="4" md="2">
       <v-autocomplete
         v-if="loaded" 
@@ -41,12 +49,13 @@ export default {
     return {
       loaded: false,
       loading: false,
-      items: [ 'ptwiki'],
       select: 'ptwiki',
       wikis: [ 'ptwiki'],
       dataTypes: ['%_of_editors', 'count', 'editcount', '%_of_edits'],
       dataType: <DataType> '%_of_edits',
-      after: <Date | string > new Date(new Date().setDate(new Date().getDate() - 30))
+      periodicity: "monthly",
+      periodicities: ['monthly', 'weekly', 'daily'],
+      after: <Date | string > new Date(new Date().setDate(new Date().getDate() - 900))
     }
   },
   async mounted () {

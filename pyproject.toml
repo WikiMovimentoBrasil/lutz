@@ -16,6 +16,7 @@ alembic = "^1.8.1"
 sqlalchemy = "^1.4.44"
 numpy = "^1.23.5"
 flask-cors = "^3.0.10"
+requests = "^2.30.0"
 
 
 [tool.poetry.group.dev.dependencies]

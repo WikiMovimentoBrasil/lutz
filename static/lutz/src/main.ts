@@ -18,7 +18,13 @@ const messages = {
             Neutral: "Neutral",
             dataType: "Type of data",
             about: "This tool grabs the data for gender set in user preferences by each editor in Wikimedia projects and graphs it.",
-            startDate: "Start date"
+            startDate: "Start date",
+            periodicity: "Periodicity",
+            periodicities: {
+                monthly: "monthly",
+                daily: "daily",
+                weekly: "weekly",
+            }
         },
         menu: {
             home: 'Home',
@@ -34,7 +40,13 @@ const messages = {
             Neutral: "Não especificado",
             dataType: "Tipo de dados",
             about: "Essa ferramenta puxa os dados de gêneros definidos nas preferências de cada editor em projetos Wikimedia e cria gráficos.",
-            startDate: "Data de início"
+            startDate: "Data de início",
+            periodicity: "Periodicidade",
+            periodicities: {
+                monthly: "mensal",
+                daily: "diário",
+                weekly: "semanal",
+            }
         },
         menu: {
             home: 'Início',
