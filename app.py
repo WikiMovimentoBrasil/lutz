@@ -167,12 +167,18 @@ def period():
     period_end = request.args.get('period_end', '')
     if period_start == '' or period_end == '':
         abort(400, description="period_start and period_end must be set")
+    try:
+        period_start = datetime.datetime.fromisoformat(period_start)
+        period_end = datetime.datetime.fromisoformat(period_end)
+    except Exception:
+        abort(400, description="Could not parse period start and end, is it in ISO format?")
     test, results = maybe_snapshot('period', wiki, snapshot_con, limit, period_start=period_start, period_end=period_end )
     if test:
         replicas_con = create_replicas_connection(wiki)
-        df = pd.read_sql(recent_changes_query.format(
+        df = pd.read_sql(periodical_query.format(
                         tagged_bots=remove_tagged_bots,
-                        limit=limit), replicas_con)
+                        limit=limit, period_start=period_start,
+                        period_end=period_end), replicas_con)
         stats = get_gender_stats(df, limit).to_dict()
         session = Session(bind=snapshot_con)
         snap = Snapshot(
@@ -185,6 +191,8 @@ def period():
             edits_male=stats['editcount'].get('male', 0),
             edits_female=stats['editcount'].get('female', 0),
             edits_neutral=stats['editcount'].get('neutral', 0),
+            period_start=period_start,
+            period_end=period_end,
             limit=limit,
         )
         session.add(snap)
@@ -238,15 +246,10 @@ def create_snapshot_data_connection():
 
 def maybe_snapshot(
     snapshot_type, wiki, con, limit,
-    timedelta=datetime.timedelta(hours=11), period_start='', period_end=''
+    timedelta=datetime.timedelta(hours=11), period_start=None, period_end=None
 ):
     session = Session(bind=con)
     if snapshot_type == 'period':
-        try:
-            period_start = datetime.datetime.strptime(period_start, '%Y%m%d%H%M%S')
-            period_end = datetime.datetime.strptime(period_end, '%Y%m%d%H%M%S')
-        except:
-            abort(400, 'Error parsing period dates')
         if period_end > datetime.datetime.now():
             abort(400, 'End period is greater than today, count would be incomplete')
         existing_snapshot = session.query(Snapshot).filter(
