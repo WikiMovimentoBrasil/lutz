@@ -73,8 +73,9 @@ class Snapshot(Base):
                 },
             }
         }
-        if self.type == 'period':
-            out['period_start'] = self.period_start
-            out['period_end'] = self.period_end
+        if self.type == 'periodical':
+            out["timestamp"] =  self.period_start.isoformat()
+            out['period_start'] = self.period_start.isoformat()
+            out['period_end'] = self.period_end.isoformat()
             out['periodicity'] = self.periodicity
         return out
