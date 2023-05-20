@@ -73,7 +73,7 @@ class Snapshot(Base):
                 },
             }
         }
-        if self.type == SnapshotEnum.periodical
+        if self.type == SnapshotEnum.periodical:
             out["timestamp"] =  self.period_start.isoformat()
             out['period_start'] = self.period_start.isoformat()
             out['period_end'] = self.period_end.isoformat()
