@@ -48,15 +48,15 @@ remove_tagged_bots = '''left join
         ug_group is null and ufg_group is null'''
 
 periodical_query = """SELECT
-	`user`.`user_name`,
+	`u`.`user_name`,
     `revs`.`total` AS `user_editcount`,
     `user_properties`.`up_value`
-FROM `user`
+FROM `user` u
 LEFT JOIN `user_properties` ON (
-  `user`.`user_id` = `user_properties`.`up_user`
+  `u`.`user_id` = `user_properties`.`up_user`
   AND `user_properties`.`up_property` = "gender"
 )
-LEFT JOIN `actor` ON `user`.`user_id` = `actor`.`actor_user`
+LEFT JOIN `actor` ON `u`.`user_id` = `actor`.`actor_user`
 LEFT JOIN (
   SELECT rev_actor, COUNT(rev_id) as `total`
   FROM revision
