@@ -293,6 +293,7 @@ def maybe_snapshot(
             Snapshot.limit == limit,
         )
     if existing_snapshot.first() is None:
+        print('No snapshot, querying replicas')
         session.close()
         return (True, None)
     session.close()
