@@ -223,6 +223,8 @@ def period():
         session.commit()
         results = snap.to_dict()
         session.close()
+        replicas_con.dispose()
+    snapshot_con.dispose()
     return results
 
 @app.route('/recent')
@@ -254,6 +256,8 @@ def recent():
         session.commit()
         results = snap.to_dict()
         session.close()
+        replicas_con.dispose()
+    snapshot_con.dispose()
     return results
 
 
@@ -341,6 +345,7 @@ def snapshots():
             Snapshot.limit == limit,
         ).order_by(Snapshot.timestamp.asc())
     session.close()
+    snapshot_con.dispose()
     return [snap.to_dict() for snap in snapshots]
 
 @app.route('/wikis')
@@ -348,6 +353,8 @@ def wikis():
     snapshot_con = create_snapshot_data_connection()
     session = Session(bind=snapshot_con)
     wikis = session.query(Snapshot.wiki).distinct()
+    session.close()
+    snapshot_con.dispose()
     return [wiki[0] for wiki in wikis]
 
 @app.route('/')
