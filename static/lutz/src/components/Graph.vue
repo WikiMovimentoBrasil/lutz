@@ -4,8 +4,10 @@
         @changedDataType="changedDataType"
         @changedStartDate="changedStartDate"
     > </GraphOptions>
-  <Line v-if="loaded" :data="data" ref="line" />
+    <div class="chart-container" style="position: relative; height:78vh; width:100vw">
+  <Line v-if="loaded" :data="data" ref="line" style="{maintainAspectRatio: false, aspectRatio:1/10}"/>
   <div v-else> {{$t("message.loading")}}</div>
+    </div>
 </template>
 
 <script lang="ts">

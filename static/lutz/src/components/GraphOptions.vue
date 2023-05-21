@@ -4,6 +4,7 @@
       <v-select
         v-model="periodicity"
         :items="periodicities"
+        :item-title="title => this.$t(title.title)"
         :label="this.$t('message.periodicity')"
         @update:model-value="emitChangedPeriodicity"
       />
@@ -53,8 +54,11 @@ export default {
       wikis: [ 'ptwiki'],
       dataTypes: ['%_of_editors', 'count', 'editcount', '%_of_edits'],
       dataType: <DataType> '%_of_edits',
-      periodicity: "monthly",
-      periodicities: ['monthly', 'weekly', 'daily'],
+      periodicity: {title: this.$t('message.periodicities.monthly'), value: 'monthly'},
+      periodicities: [
+        {title: 'message.periodicities.monthly', value: 'monthly'},
+        {title: 'message.periodicities.weekly', value: 'weekly'},
+        {title: 'message.periodicities.daily', value: 'daily'}],
       after: <Date | string > new Date(new Date().setDate(new Date().getDate() - 900))
     }
   },
@@ -75,6 +79,9 @@ export default {
     },
     emitChangedStartDate: function(event: unknown){
       this.$emit('changedStartDate', event)
+    },
+    emitChangedPeriodicity: function(event: unknown){
+      this.$emit('changedPeriodicity', event)
     }
   }
 }

@@ -15,7 +15,7 @@ const messages = {
             loading: 'Waiting for data',
             Female: "Female",
             Male: "Male",
-            Neutral: "Neutral",
+            Neutral: "Not specified",
             dataType: "Type of data",
             about: "This tool grabs the data for gender set in user preferences by each editor in Wikimedia projects and graphs it.",
             startDate: "Start date",

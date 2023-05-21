@@ -12,7 +12,9 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header>
-    <img alt="Bertha Lutz" class="logo" src="@/assets/bertha-removebg.png" width="60" height="60" />
+    <a href="https://www.wikidata.org/wiki/Q1264246" >
+      <img alt="Bertha Lutz" class="logo" src="@/assets/bertha-removebg.png" width="60" height="60" />
+    </a>
 
       <nav>
         <RouterLink to="/">{{ $t("menu.home")}}</RouterLink>
@@ -30,8 +32,8 @@ import { RouterLink, RouterView } from 'vue-router'
         </v-select>
       </div>
     </div>
-    <div class="wrapper-right">
-      <img alt="Logo negativo do Wiki Movimento Brasil" class="logo-wmb" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Wiki_Movimento_Brasil_-_logo_negativo.svg" />
+    <div class="wrapper-right" >
+      <img alt="Logo negativo do Wiki Movimento Brasil" class="logo-wmb" src="https://upload.wikimedia.org/wikipedia/commons/4/45/Wiki_Movimento_Brasil_logo.svg" />
     </div>
   </header>
 
@@ -50,8 +52,10 @@ nav {
 
 .locale-changer {
 }
-.logo-wmb {
-  max-height: 8vh;
+.logo-wmb  {
+  max-height: 9
+  
+  vh;
   position: absolute;
   margin-top: 0.5vh;
   right: 0;
