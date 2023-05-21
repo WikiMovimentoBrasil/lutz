@@ -344,18 +344,20 @@ def snapshots():
             Snapshot.type == type,
             Snapshot.limit == limit,
         ).order_by(Snapshot.timestamp.asc())
+    out = [snap.to_dict() for snap in snapshots]
     session.close()
     snapshot_con.dispose()
-    return [snap.to_dict() for snap in snapshots]
+    return out
 
 @app.route('/wikis')
 def wikis():
     snapshot_con = create_snapshot_data_connection()
     session = Session(bind=snapshot_con)
     wikis = session.query(Snapshot.wiki).distinct()
+    out = [wiki[0] for wiki in wikis]
     session.close()
     snapshot_con.dispose()
-    return [wiki[0] for wiki in wikis]
+    return out
 
 @app.route('/')
 def index():
