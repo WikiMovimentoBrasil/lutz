@@ -334,7 +334,7 @@ def snapshots():
             Snapshot.period_start > after,
             Snapshot.type == type,
             Snapshot.limit == limit,
-        ).distinct().order_by(Snapshot.period_start.asc())
+        ).distinct(Snapshot.period_start).order_by(Snapshot.period_start.asc())
 
     else:
         snapshots = session.query(Snapshot).filter(
