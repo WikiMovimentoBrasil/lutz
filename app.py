@@ -176,8 +176,9 @@ def period():
     except Exception:
         abort(400, description="Could not parse period start and end, is it in ISO format?")
     if periodicity == 'monthly':
-        if not (period_end.year == period_start.year and
-                period_end.day == period_start.day and period_end.month - period_start.month == 1):
+        if not (period_end.day == period_start.day and (
+                (period_end.month - period_start.month == 1) and period_end.year == period_start.year) or
+                period_start.month - period_end.month == 11 and period_end.year - period_start.year == 1):
             abort(400, "Period should be exactly one month")
     if periodicity == 'weekly':
         if not (period_start.weekday == 0 and period_end.weekday == 0):
@@ -272,7 +273,7 @@ def maybe_snapshot(
     periodicity=None
 ):
     session = Session(bind=con)
-    if snapshot_type == 'period':
+    if snapshot_type == 'periodical':
         if period_end > datetime.datetime.now():
             abort(400, 'End period is greater than today, count would be incomplete')
         existing_snapshot = session.query(Snapshot).filter(
