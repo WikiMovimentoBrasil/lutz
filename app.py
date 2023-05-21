@@ -278,7 +278,6 @@ def maybe_snapshot(
             abort(400, 'End period is greater than today, count would be incomplete')
         existing_snapshot = session.query(Snapshot).filter(
             Snapshot.wiki == wiki,
-            Snapshot.timestamp > datetime.datetime.now() - timedelta,
             Snapshot.type == snapshot_type,
             Snapshot.limit == limit,
             Snapshot.period_start == period_start,
