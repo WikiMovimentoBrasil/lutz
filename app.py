@@ -189,7 +189,7 @@ def period():
             abort(400, "Daily snapshots period should be 1 day")
 
     test, results = maybe_snapshot(
-        'period', wiki, snapshot_con, limit, period_start=period_start, period_end=period_end,
+        'periodical', wiki, snapshot_con, limit, period_start=period_start, period_end=period_end,
         periodicity=periodicity)
     if test:
         replicas_con = create_replicas_connection(wiki)
@@ -205,7 +205,7 @@ def period():
         session = Session(bind=snapshot_con)
         snap = Snapshot(
             wiki=wiki,
-            type='recent',
+            type='periodical',
             timestamp=datetime.datetime.now(),
             editors_male=stats['count'].get('male', 0),
             editors_female=stats['count'].get('female', 0),
