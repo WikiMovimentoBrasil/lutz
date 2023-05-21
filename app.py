@@ -217,6 +217,7 @@ def period():
             period_start=period_start,
             period_end=period_end,
             limit=limit,
+            periodicity=periodicity,
         )
         session.add(snap)
         session.commit()
