@@ -39,7 +39,6 @@ import { RouterLink, RouterView } from 'vue-router'
 
   <RouterView />
 </template>
-
 <style scoped>
 header {
   line-height: 1.5;
@@ -53,9 +52,7 @@ nav {
 .locale-changer {
 }
 .logo-wmb  {
-  max-height: 9
-  
-  vh;
+  max-height: 10vh;
   position: absolute;
   margin-top: 0.5vh;
   right: 0;

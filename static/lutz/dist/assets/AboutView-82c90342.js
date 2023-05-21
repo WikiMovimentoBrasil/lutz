@@ -1,1 +1,0 @@
-import{_ as t,o as s,c as o,a,t as _}from"./index-4834c16d.js";const c={},n={class:"about"};function r(e,i){return s(),o("div",n,[a("h1",null,_(e.$t("message.about")),1)])}const u=t(c,[["render",r]]);export{u as default};
