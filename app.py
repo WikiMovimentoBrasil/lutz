@@ -296,12 +296,13 @@ def maybe_snapshot(
             Snapshot.type == snapshot_type,
             Snapshot.limit == limit,
         )
-    if existing_snapshot.first() is None:
+    existing_snapshot = existing_snapshot.first()
+    if existing_snapshot is None:
         print('No snapshot, querying replicas')
         session.close()
         return (True, None)
     session.close()
-    return (False, existing_snapshot.first().to_dict())
+    return (False, existing_snapshot.to_dict())
 
 
 @app.route('/snapshots')
